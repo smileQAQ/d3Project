@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            font-size: 0;
+        }
+        .tip{
+            transition: all .25s;
+        }
+    </style>
+</head>
+<body>
+<svg id="container"></svg>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    const svg = d3.select('#container')
+        .attr('width', document.documentElement.clientWidth)
+        .attr('height', document.documentElement.clientHeight)
+
+    const data = [
+        {name: 'n1', value: 10,  label: "Point 1" },
+        {name: 'n2', value: 20},
+        {name: 'n3', value: 30},
+        {name: 'n4', value: 80},
+        {name: 'n5', value: 90},
+        {name: 'n6', value: 50},
+        { name: 'n7', value: 20 },
+        { name: 'n8', value: 70 },
+    ]
+    
+    const width = +svg.attr('width');
+    const height = +svg.attr('height');
+    const margin = {top:100, left: 200, bottom: 100, right: 200};
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+
+    const xValue = v => v.name;
+    const yValue = v => v.value;
+
+    const xScale = d3.scaleBand()
+        .domain(data.map(d => xValue(d)))
+        .range([0, innerWidth])
+        .padding(0.5)
+
+    const yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => yValue(d))])
+        .range([innerHeight, 0])
+
+    const g = svg.append('g').attr('id', 'mapGroup').attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    const yAxis = d3.axisLeft(yScale);
+    g.append('g')
+    .attr('class', "y-axis")
+    .attr('transform', `translate(0,${innerHeight}) scale(0)`)
+    .call(yAxis);
+
+    svg.select(".y-axis")
+        .transition()
+        .duration(750)
+        .attr('transform', 'translate(0, 0) scale(1)');
+
+    const xAxis = d3.axisBottom(xScale);
+    g.append('g')
+    .attr("class", "x-axis")
+    .attr('transform', `translate(0,${innerHeight}) scale(0)`)
+    .call(xAxis);
+
+    svg.select(".x-axis")
+        .transition()
+        .duration(750)
+        .attr('transform', `translate(0,${innerHeight}) scale(1)`)
+
+    const color = d3.scaleOrdinal(d3.schemePastel2);
+    
+    g.selectAll('rect')
+        .data(data)
+        .join('rect')
+        .attr('x', d => xScale(xValue(d)))
+        .attr('y', innerHeight)
+        .attr('width', xScale.bandwidth())
+        .attr('fill', (d, i) => color(i))
+        .attr('height', 0)
+        .on('mouseenter', (d)=>{ showTip(d) })
+        .on('mouseleave', (d)=>{ hideTip(d) })
+        .transition()
+        .duration(750)
+        .delay((d, i) => i * 100)
+        .attr('height', d => innerHeight - yScale(yValue(d)))
+        .attr('y', d=> yScale(yValue(d)))
+
+    let tip_g = g.append('g').attr('class', 'tip').attr('opacity', 0);
+    let tip_text = tip_g.append('text').text('123123').attr('fill', 'red').style("font-size", "20px");
+    
+    function showTip(d){
+        let top = 0,
+            left = d.offsetX - margin.left ;
+            debugger
+        console.log(d)
+        tip_g.attr('opacity', 1)
+            .attr('transform', `translate(${left}, ${top})`)
+    }
+    function hideTip(d){
+        tip_g.attr('opacity', 0)
+    }
+</script>
+</body>
+</html>

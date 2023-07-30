@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+</head>
+<body>
+    <svg id="svg" class="svgs"></svg>
+    
+    <script>
+        const svg = d3.select("#svg")
+            .attr('width', document.documentElement.clientWidth)
+            .attr('height', document.documentElement.clientHeight);
+        const width = +svg.attr('width');
+        const height = +svg.attr('height');
+        const margin = { top: 100, left: 200, bottom: 100, right: 200 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        const g = svg.append('g').attr('id','mapGroup').attr('transform', `translate(${margin.left},${margin.top})`);
+
+        const projection = d3.geoNaturalEarth1();
+        const geo = d3.geoPath().projection(projection);
+        {{/*  const tip = d3.tip()
+        .attr('class','d3-tip').html(d=> {return "111"});
+        svg.call(tip);  */}}
+        
+        async function getEarth() {  
+            const world = await d3.json(
+                "https://cdn.jsdelivr.net/npm/world-atlas@1/world/110m.json"
+            );
+            const countries = topojson.feature(world, world.objects.countries);
+            console.log(countries.features)
+            projection.fitSize([innerWidth, innerHeight], countries);
+
+            g.selectAll('path').data(countries.features).join('path')
+            .attr('d', geo)
+            .attr('stroke', 'black')
+            .attr('stroke-width', 1)
+            .on('mouseover', function(d){
+                d3.select(this)
+                .attr('opacity', 0.5)
+                .attr('stroke','white');
+            })
+            .on('mouseout',function(d){
+                d3.select(this)
+                .attr('opacity',1)
+                .attr('stroke','black');
+            })
+            .on('click',function(d){
+                {{/*  tip.show(d)  */}}
+            });
+        }
+        getEarth();
+    </script>
+</body>
+</html>

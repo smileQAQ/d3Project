@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <svg id="svg" class="svgs"></svg>
+    <script>
+        const svg = d3.select("#svg")
+            .attr('width', document.documentElement.clientWidth)
+            .attr('height', document.documentElement.clientHeight);
+        const width = +svg.attr('width');
+        const height = +svg.attr('height');
+        const margin = { top: 100, left: 200, bottom: 100, right: 200 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+        let lines,circles,simulation;
+        
+        var links = [
+            {source: 0, target: 3},
+            {source: 1, target: 3},
+            {source: 2, target: 3},
+            {source: 3, target: 3},
+            {source: 4, target: 3},
+            { source: 5, target: 1},
+            { source: 6, target: 2},
+            { source: 7, target: 1},
+            { source: 8, target: 9},
+            { source: 9, target: 1},
+            { source: 10, target: 0 },
+        ]
+        const nodes = [];
+        const render = function() {
+            lines = svg.selectAll('line').data(links).join('line')
+                .attr('stroke', 'black')
+                .attr('opacity', 0.8)
+                .attr('stroke-width', 0.5)
+
+            circles = svg.selectAll('circle').data(nodes).join('circle')
+                .attr('r', 5)
+                .attr('fill', 'orange')
+        }
+
+        const ticked = function () {
+            lines
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+
+            circles
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
+        }
+
+        for(let i=0; i< links.length; i++){
+            nodes.push({'index':i})
+        }
+        render();
+        simulation = d3.forceSimulation(nodes)
+        .force('manybody',d3.forceManyBody().strength(-30))
+        .force('center', d3.forceCenter(width/2, height/2))
+        .force('link', d3.forceLink(links).strength(0.1).distance(100))
+        .on('tick', ticked);
+    </script>
+</body>
+
+</html>

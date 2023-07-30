@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <svg id="svg" class="svgs"></svg>
+    <script>
+        const svg = d3.select("#svg")
+            .attr('width', document.documentElement.clientWidth)
+            .attr('height', document.documentElement.clientHeight);
+        const width = +svg.attr('width');
+        const height = +svg.attr('height');
+        const margin = { top: 100, left: 200, bottom: 100, right: 200 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const data = {
+            name: 'games',
+            children: [
+                {
+                    name: 'RPG',
+                    children: [
+                        { name: 'the elder scroll', popularity: 500 },
+                        { name: 'hahaha', popularity: 500 },
+                        { name: 'zzzzz', popularity: 500 },
+                        { name: 'eeee', popularity: 500 }
+                    ]
+                },
+                {
+                    name: 'solo',
+                    children: [
+                        { name: 'wwwww', popularity: 500 },
+                        { name: 'ttttt', popularity: 1000 },
+                        { name: 'uuuuu', popularity: 2000 },
+                        { name: 'iiiiii', popularity: 500 }
+                    ]
+                }
+            ]
+        }
+
+         const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+        let root;
+        let color;
+
+        root = d3.partition().size([innerWidth, innerHeight])(
+            d3.hierarchy(data).sum(d=>d.popularity)
+            .sort((a,b)=>b.popularity - a.popularity)
+        );
+
+        const render = data =>{
+            color = d3.scaleOrdinal(d3.schemeCategory10)
+            const fill = d => {
+                while (d.depth > 1) {
+                    d = d.parent;
+                }
+                return color(d.data.name);
+            };
+
+            g.selectAll('datarect').data(data.descendants()).join('rect')
+            .attr('class', 'datarect')
+            .attr('fill', fill)
+            .attr('x', d=> d.y0)
+            .attr('y', d=>d.x0)
+            .attr('height', d => d.x1 - d.x0)
+            .attr('width', d => d.y1 - d.y0)
+
+            g.selectAll('text').data(data.descendants()).join('text')
+            .attr('x', d=> (d.y0 + d.y1)/2)
+            .attr('y', d=> (d.x0 + d.x1)/2)
+            .attr('font-size', '1em')
+            .attr('text-anchor', 'middle')
+            .text(d => d.data.name)
+        }
+        render(root);
+    </script>
+</body>
+</html>

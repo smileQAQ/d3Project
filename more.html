@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <svg id="svg" class="svgs"></svg>
+    <script>
+        const svg = d3.select("#svg")
+            .attr('width', document.documentElement.clientWidth)
+            .attr('height', document.documentElement.clientHeight);
+        const width = +svg.attr('width');
+        const height = +svg.attr('height');
+        const margin = { top: 100, left: 200, bottom: 100, right: 200 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const g = svg.append('g').attr('transform',`tanslate(${margin.left},${margin.top})`);
+
+        const gradient = g.append('defs').append('linearGradient')
+        .attr('id', 'linear-gradient')
+        .attr('x1', '0%')
+        .attr('y1', '0%')
+        .attr('x2', '100%')
+        .attr('y2', '0%');
+
+        gradient.append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color','orange');
+        
+        gradient.append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', 'red')
+
+        g.append('rect')
+        .attr('width', 200)
+        .attr('height', 100)
+        .style('fill','url(#linear-gradient)');
+    </script>
+    
+</body>
+</html>

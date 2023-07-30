@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <svg width ="1600" height="800" id="svg" class="svgs"></svg>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script>
+        const data=[
+            { name: '1111', value: 14 },
+            { name: '2222', value: 3 },
+            { name: '3333', value: 10 },
+            { name: '4444', value: 8 },
+            { name: '5555', value: 16 },
+            { name: '6666', value: 12 },
+            { name: '6666', value: 18 },
+            { name: '7777', value: 5 },
+        ]
+        const data2 = [
+            { name: '2222', value: 7 },
+            { name: '1111', value: 5 },
+            { name: '3333', value: 10 },
+            { name: '4444', value: 8 },
+            { name: '5555', value: 16 },
+            { name: '6666', value: 12 },
+            { name: '6666', value: 18 },
+            { name: '7777', value: 5 },
+        ]
+
+        const svg = d3.select("#svg")
+        .attr('width',document.body.clientWidth)
+        .attr('height',document.body.clientHeight);
+        const width = +svg.attr('width');
+        const height = +svg.attr('height');
+        const margin = {top:100,right:120,bottom:100,left:120};
+        const innerWidth = width -margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const xScale = d3.scaleLinear()
+        .domain([0,d3.max(data,d=>d.value)])
+        .range([0, innerWidth]);
+
+        const yScale = d3.scaleBand()
+        .domain(data.map(d=>d.name))
+        .range([0,innerHeight])
+        .padding(0.1);
+
+        const g = svg.append('g')
+        .attr('id','maingroup')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        const yAxis = d3.axisLeft(yScale)
+        .tickSize(-innerWidth);
+        g.append('g').call(yAxis);
+
+        const xAxis = d3.axisBottom(xScale)
+        .tickSize(-innerHeight);
+        g.append('g').call(xAxis).attr('transform',`translate(0,${innerHeight})`);
+
+        {{/*  data.forEach(d=>{
+            g.append('rect')
+            .attr('width', xScale(d.value))
+            .attr('height', yScale.bandwidth())
+            .attr('fill','orange')
+            .attr('y', yScale(d.name));
+        })  */}}
+        d3.selectAll('#maingroup text').attr('font-size','2em');
+
+        g.append('text')
+        .text('Membe')
+        .attr('font-size','3em')
+        .attr('transform',`translate(${innerWidth/2},${innerHeight + margin.bottom})`)
+        .attr('text-anchor','middle');
+
+        g.append('text')
+        .text('Membe')
+        .attr('font-size', '3em')
+        .attr('transform', `translate(${-margin.left/2},${innerHeight/2}) rotate(-90)`)
+        .attr('text-anchor', 'middle');
+    </script>
+</body>
+</html>
